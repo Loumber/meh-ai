@@ -15,13 +15,20 @@ android {
         applicationId = "com.meh.ai"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+
+        val computedVersionCode = if (project.hasProperty("versionCode")) {
+            project.property("versionCode").toString().toInt()
+        } else {
+            1
+        }
+
+        versionCode = computedVersionCode
+        versionName = "0.0.$computedVersionCode"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
+     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
