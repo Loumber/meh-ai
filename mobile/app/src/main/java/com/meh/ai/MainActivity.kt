@@ -2,46 +2,42 @@ package com.meh.ai
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.toArgb
+import com.meh.ai.assistant.ui.AssistantScreen
 import com.meh.ai.ui.theme.MehAITheme
+import com.meh.ai.ui.theme.Night
+import com.meh.ai.ui.theme.Paper
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            MehAITheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            val darkTheme = isSystemInDarkTheme()
+            val barColor = (if (darkTheme) Night else Paper).toArgb()
+            SideEffect {
+                enableEdgeToEdge(
+                    statusBarStyle = if (darkTheme) {
+                        SystemBarStyle.dark(barColor)
+                    } else {
+                        SystemBarStyle.light(barColor, barColor)
+                    },
+                    navigationBarStyle = if (darkTheme) {
+                        SystemBarStyle.dark(barColor)
+                    } else {
+                        SystemBarStyle.light(barColor, barColor)
+                    },
+                )
+            }
+            MehAITheme(darkTheme = darkTheme) {
+                AssistantScreen(modifier = Modifier.fillMaxSize())
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MehAITheme {
-        Greeting("Android")
     }
 }
