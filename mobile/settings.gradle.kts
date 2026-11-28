@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Meh AI"
 include(":app")
- 
+include(":tool-registry")
