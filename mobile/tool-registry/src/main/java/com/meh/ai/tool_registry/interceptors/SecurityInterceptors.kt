@@ -6,6 +6,12 @@ import com.meh.ai.tool_registry.security.UserConfirmationProvider
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeout
 
+/**
+ * Ограничивает максимальное время выполнения инструмента.
+ * При превышении [timeoutMs] возвращает [ToolExecutionResult.ErrorCode.EXECUTION_TIMEOUT].
+ *
+ * @property timeoutMs Лимит времени в миллисекундах (по умолчанию 10 секунд).
+ */
 class TimeoutInterceptor(
     private val timeoutMs: Long = 10_000L
 ) : ToolInterceptor {
@@ -26,6 +32,10 @@ class TimeoutInterceptor(
     }
 }
 
+/**
+ * Проверяет наличие системных разрешений из [com.meh.ai.tool_registry.ToolDescriptor.requiredPermissions].
+ * При отсутствии прав прерывает цепочку с кодом [ToolExecutionResult.ErrorCode.PERMISSION_DENIED].
+ */
 class PermissionInterceptor(
     private val permissionChecker: PermissionChecker
 ) : ToolInterceptor {
@@ -48,6 +58,10 @@ class PermissionInterceptor(
     }
 }
 
+/**
+ * Запрашивает подтверждение пользователя для инструментов с флагом `isSensitive = true`.
+ * При отказе прерывает цепочку с кодом [ToolExecutionResult.ErrorCode.USER_REJECTED].
+ */
 class UserConfirmationInterceptor(
     private val confirmationProvider: UserConfirmationProvider
 ) : ToolInterceptor {

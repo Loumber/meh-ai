@@ -17,13 +17,30 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
+/**
+ * Аннотация для добавления текстового описания поля в генерируемую JSON Schema.
+ * Помогает языковой модели точнее понимать формат и назначение параметра.
+ *
+ * @property description Пояснение для LLM (например, `"Номер телефона в формате +7..."`).
+ */
 @OptIn(ExperimentalSerializationApi::class)
 @SerialInfo
 @Target(AnnotationTarget.PROPERTY)
 annotation class ToolParamDescription(val description: String)
 
+/**
+ * Утилита автогенерации JSON Schema (Draft-07) из [SerialDescriptor] классов `kotlinx.serialization`.
+ */
 @OptIn(ExperimentalSerializationApi::class)
 object SchemaGenerator {
+
+    /**
+     * Генерирует JSON Schema входных параметров инструмента на основе дескриптора его `@Serializable` класса.
+     * Поля без значения по умолчанию автоматически попадают в массив `required`.
+     *
+     * @param descriptor Дескриптор сериализатора аргументов (`MyArgs.serializer().descriptor`).
+     * @return Готовый [JsonObject] с полями `type`, `properties` и `required`.
+     */
     fun generateParametersSchema(descriptor: SerialDescriptor): JsonObject = buildJsonObject {
         put("type", "object")
         putJsonObject("properties") {
@@ -48,6 +65,12 @@ object SchemaGenerator {
         }
     }
 
+    /**
+     * Собирает массив всех инструментов в стандартном формате Function Calling (OpenAI / Gemini / Local LLM).
+     *
+     * @param descriptors Список дескрипторов доступных инструментов.
+     * @return [JsonArray], готовый для вставки в поле `tools` API-запроса или системный промпт.
+     */
     fun generateToolsJsonArray(descriptors: List<ToolDescriptor>): JsonArray = buildJsonArray {
         descriptors.forEach { tool ->
             addJsonObject {
